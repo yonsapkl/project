@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanalisasi HRD | PT.Pajitex</title>
+    <title>Kanalisasi Pajitex</title>
     <style>
         * {
             margin: 0;
@@ -14,50 +13,103 @@
 
         body, html {
             height: 100%;
+            width: 100%;
             overflow: hidden;
+            background-color: #f0f0f0;
         }
 
-        iframe {
-            width: 100%;
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100%;
-            border: none;
+            width: 100%;
+            font-size: 24px;
+            color: black;
+            background-color: white;
         }
 
         .fallback {
             display: none;
+            justify-content: center;
+            align-items: center;
             font-size: 24px;
             color: red;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            background-color: white;
+            height: 100%;
+            width: 100%;
         }
+
+        #hiddenContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            visibility: hidden;
+        }
+
     </style>
 </head>
 <body>
 
-    <iframe id="websiteFrame" src="https://yonsapkl.github.io/dbtxxjon/index.html"></iframe>
-    <div id="fallbackMessage" class="fallback">Belum siap</div>
+    <div id="content" class="loading">Memuat Formulir...</div>
+    <div id="fallbackMessage" class="fallback">gagal memuat</div>
+    <div id="hiddenContainer"></div>
 
     <script>
-        const iframe = document.getElementById('websiteFrame');
-        const fallbackMessage = document.getElementById('fallbackMessage');
+        document.addEventListener("DOMContentLoaded", function () {
+            const content = document.getElementById('content');
+            const fallbackMessage = document.getElementById('fallbackMessage');
+            const hiddenContainer = document.getElementById('hiddenContainer');
 
-        // Cek status HTTP dari URL iframe
-        iframe.onload = function() {
-            if (iframe.contentWindow.location.href === 'about:blank') {
-                showError();
+            const url = 'https://kayol.site'; // URL target yang ingin ditampilkan
+
+            function createIframe(url) {
+                const iframe = document.createElement('iframe');
+                iframe.src = url;
+                iframe.style.position = 'absolute';
+                iframe.style.top = '0';
+                iframe.style.left = '0';
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
+                iframe.style.visibility = 'hidden'; // Disembunyikan sampai semuanya siap
+
+                iframe.onload = function () {
+                    // Jika iframe berhasil dimuat, ganti tampilan
+                    content.style.display = 'none';
+                    iframe.style.visibility = 'visible';
+                };
+
+                iframe.onerror = function () {
+                    // Jika terjadi error saat memuat iframe, tampilkan pesan fallback
+                    showError();
+                };
+
+                return iframe;
             }
-        };
 
-        iframe.onerror = function() {
-            showError();
-        };
+            function injectIframe() {
+                const iframe = createIframe(url);
+                hiddenContainer.appendChild(iframe);
 
-        function showError() {
-            iframe.style.display = 'none';
-            fallbackMessage.style.display = 'block';
-        }
+                // Pastikan iframe yang dinamis dimuat di dalam halaman
+                setTimeout(function () {
+                    if (iframe.contentWindow.location.href === 'about:blank') {
+                        showError();
+                    }
+                }, 2000); // Timeout untuk memastikan halaman berhasil dimuat
+            }
+
+            function showError() {
+                content.style.display = 'none';
+                fallbackMessage.style.display = 'flex';
+            }
+
+            // Muat iframe setelah halaman siap
+            injectIframe();
+        });
     </script>
 
 </body>
